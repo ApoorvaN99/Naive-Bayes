@@ -1,0 +1,32 @@
+import pandas as pd
+dataset=pd.read_csv('p6.csv',names=['sentence','label'])
+instances=dataset.sentence
+targets=dataset.label
+
+i3,t3=instances[:3],targets[:3]
+for x,y in zip(i3,t3):
+    print(x,",",y)
+    
+from sklearn.model_selection import train_test_split 
+xtrain,xtest,ytrain,ytest=train_test_split(instances,targets,test_size=0.5)
+print("no. of training instances=",xtrain.shape[0])
+print("no. of testing instances=",xtest.shape[0])
+
+from sklearn.feature_extraction.text import CountVectorizer
+cv=CountVectorizer()
+xtrain_mat=cv.fit_transform(xtrain)
+xtest_mat=cv.transform(xtest)
+print("features extracted=",cv.get_feature_names())
+print("total no. of features=",len(cv.get_feature_names()))
+
+from sklearn.naive_bayes import MultinomialNB
+model=MultinomialNB().fit(xtrain_mat,ytrain)
+pred=model.predict(xtest_mat)
+
+print("\npredictions:")
+for a,b in zip(xtest,pred):
+    print(a,"->",b)
+
+from sklearn import metrics
+print("\naccuracy=",metrics.accuracy_score(ytest,pred),"recall=",metrics.recall_score(ytest,pred))
+print("precision=",metrics.precision_score(ytest,pred),"conusion matrix=",metrics.confusion_matrix(ytest,pred))
